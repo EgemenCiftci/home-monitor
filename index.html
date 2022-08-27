@@ -1,0 +1,64 @@
+﻿<!doctype html>
+<html>
+
+<head>
+    <title>Home Monitor</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <link rel="stylesheet" href="css/main.css" />
+    <script src="js/raphael.2.1.0.min.js"></script>
+    <script src="js/justgage.1.0.1.min.js"></script>
+    <script src="js/bbt.min.js"></script>
+    <script src="js/jquery-2.1.3.min.js"></script>
+    <script src="js/socket.io.js"></script>
+    <script>
+        var g1, g2;
+        window.onload = function () {
+            var g1 = new JustGage({
+                id: "g1",
+                value: 0,
+                min: 13,
+                max: 28,
+                title: "Temperature",
+                label: "°C",
+                levelColors: ["#0066CC", "#00CC00", "#FFA500"],
+                levelColorsGradient: false,
+                valueFontColor: "white"
+            });
+            var g2 = new JustGage({
+                id: "g2",
+                value: 0,
+                min: 15,
+                max: 75,
+                title: "Humidity",
+                label: "%",
+                levelColors: ["#996600", "#00CC00", "#0099FF"],
+                levelColorsGradient: false,
+                valueFontColor: "white"
+            });
+            //setInterval(function () {
+            //    g1.refresh(getRandomInt(13, 28));
+            //    g2.refresh(getRandomInt(15, 75));
+            //}, 3000);
+            var bbt = new BBT('c802143a1bad792adc326342d80e8c1c');
+            bbt.subscribe({
+                channel: 'RaspberryPi2',
+                resource: 'temperature',
+            }, function (err, msg) {
+                g1.refresh(err.data.toFixed(2));
+            });
+            bbt.subscribe({
+                channel: 'RaspberryPi2',
+                resource: 'humidity',
+            }, function (err, msg) {
+                g2.refresh(err.data.toFixed(2));
+            });
+        };
+    </script>
+</head>
+
+<body>
+    <div id="g1"></div>
+    <div id="g2"></div>
+</body>
+
+</html>
